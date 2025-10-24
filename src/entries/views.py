@@ -122,3 +122,19 @@ def entry_delete(request: HttpRequest, pk: int) -> HttpResponse:
     entry.delete()
     messages.success(request, "Lançamento removido.")
     return redirect("entries:list")
+
+
+@login_required
+@require_POST
+def entry_clone(request: HttpRequest, pk: int) -> HttpResponse:
+    entry = get_object_or_404(Entry, pk=pk)
+    # Preserve all user-provided fields while letting auto fields regenerate.
+    excluded_fields = {Entry._meta.pk.attname, Entry._meta.pk.name, "created_at", "updated_at"}
+    clone_data = {
+        field.name: getattr(entry, field.name)
+        for field in Entry._meta.fields
+        if field.name not in excluded_fields
+    }
+    cloned_entry = Entry.objects.create(**clone_data)
+    messages.success(request, f"Lançamento '{entry.description}' clonado com sucesso.")
+    return redirect("entries:edit", cloned_entry.pk)
