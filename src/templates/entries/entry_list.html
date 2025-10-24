@@ -33,7 +33,7 @@
       <div id="entries-summary" class="mb-3">
         {% include "entries/partials/entry_summary.html" %}
       </div>
-      <div class="d-flex justify-content-start mb-3">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
         <button
           type="button"
           class="btn btn-primary{% if form_visible %} d-none{% endif %}"
@@ -41,6 +41,24 @@
         >
           Novo
         </button>
+        <form
+          method="get"
+          action="{% url 'entries:list' %}"
+          class="ms-auto"
+        >
+          <div class="input-group">
+            <input
+              type="search"
+              name="q"
+              class="form-control"
+              placeholder="Buscar descrição..."
+              value="{{ search_query }}"
+            />
+            <button class="btn btn-outline-secondary" type="submit">
+              Buscar
+            </button>
+          </div>
+        </form>
       </div>
       <div class="card shadow-sm mt-4">
         <div class="card-header">

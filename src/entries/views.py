@@ -5,7 +5,8 @@ from typing import Any
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.core.paginator import Paginator
+from django.db.models import Q, Sum
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -44,6 +45,8 @@ def _totals_context() -> dict[str, Decimal]:
 
 
 def _entries_page_context(
+    request: HttpRequest | None = None,
+    *,
     form: EntryForm | None = None,
     editing_entry: Entry | None = None,
 ) -> dict[str, Any]:
@@ -55,9 +58,26 @@ def _entries_page_context(
         else reverse("entries:edit", args=[editing_entry.pk])
     )
     form_visible = editing_entry is not None or (form is not None and form.is_bound)
+    search_query = ""
+    page_number = 1
+    if request:
+        search_query = request.GET.get("q", "").strip()
+        try:
+            page_number = int(request.GET.get("page", 1))
+        except (TypeError, ValueError):
+            page_number = 1
+    entries_queryset = Entry.objects.all()
+    if search_query:
+        entries_queryset = entries_queryset.filter(Q(description__icontains=search_query))
+    entries_queryset = entries_queryset.order_by("payment_date", "description")
+    paginator = Paginator(entries_queryset, 10)
+    page_obj = paginator.get_page(page_number)
     return {
         "form": form,
-        "entries": Entry.objects.all(),
+        "entries": list(page_obj.object_list),
+        "page_obj": page_obj,
+        "paginator": paginator,
+        "search_query": search_query,
         "editing_entry": editing_entry,
         "form_action": form_action,
         "form_visible": form_visible,
@@ -68,7 +88,7 @@ def _entries_page_context(
 @login_required
 @require_GET
 def entry_list(request: HttpRequest) -> HttpResponse:
-    return render(request, "entries/entry_list.html", _entries_page_context())
+    return render(request, "entries/entry_list.html", _entries_page_context(request))
 
 
 @login_required
@@ -87,7 +107,12 @@ def entry_create(request: HttpRequest) -> HttpResponse:
         return redirect("entries:list")
 
     messages.error(request, "Corrija os erros antes de salvar.")
-    return render(request, "entries/entry_list.html", _entries_page_context(form), status=400)
+    return render(
+        request,
+        "entries/entry_list.html",
+        _entries_page_context(request, form=form),
+        status=400,
+    )
 
 
 @login_required
@@ -104,14 +129,14 @@ def entry_edit(request: HttpRequest, pk: int) -> HttpResponse:
         return render(
             request,
             "entries/entry_list.html",
-            _entries_page_context(form=form, editing_entry=entry),
+            _entries_page_context(request, form=form, editing_entry=entry),
             status=400,
         )
 
     return render(
         request,
         "entries/entry_list.html",
-        _entries_page_context(editing_entry=entry),
+        _entries_page_context(request, editing_entry=entry),
     )
 
 

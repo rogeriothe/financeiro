@@ -1,30 +1,70 @@
-<div id="entries-table" class="table-responsive">
-  <table class="table table-striped align-middle mb-0">
-    <thead class="table-light">
-      <tr>
-        <th>Descrição</th>
-        <th>Categoria</th>
-        <th>Tipo</th>
-        <th class="text-end">Valor original</th>
-        <th class="text-end">Valor recebido</th>
-        <th>Vencimento</th>
-        <th>Pagamento</th>
-        <th>Status</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% if entries %}
-        {% for entry in entries %}
-          {% include "entries/partials/entry_row.html" %}
-        {% endfor %}
-      {% else %}
+<div class="card-body p-0">
+  <div id="entries-table" class="table-responsive">
+    <table class="table table-striped align-middle mb-0">
+      <thead class="table-light">
         <tr>
-          <td colspan="9" class="text-center text-muted py-4">
-            Nenhum lançamento cadastrado.
-          </td>
+          <th>Descrição</th>
+          <th>Categoria</th>
+          <th>Tipo</th>
+          <th class="text-end">Valor original</th>
+          <th class="text-end">Valor recebido</th>
+          <th>Vencimento</th>
+          <th>Pagamento</th>
+          <th>Status</th>
+          <th></th>
         </tr>
-      {% endif %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% if entries %}
+          {% for entry in entries %}
+            {% include "entries/partials/entry_row.html" %}
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="9" class="text-center text-muted py-4">
+              Nenhum lançamento cadastrado.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
 </div>
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+  <div class="card-footer bg-body-tertiary">
+    <nav aria-label="Paginação de lançamentos">
+      <ul class="pagination justify-content-end mb-0">
+        <li class="page-item{% if not page_obj.has_previous %} disabled{% endif %}">
+          <a
+            class="page-link"
+            href="{% if page_obj.has_previous %}?{% if search_query %}q={{ search_query|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}{% else %}#{% endif %}"
+            tabindex="{% if page_obj.has_previous %}0{% else %}-1{% endif %}"
+            aria-label="Página anterior"
+          >
+            «
+          </a>
+        </li>
+        {% for number in page_obj.paginator.page_range %}
+          <li class="page-item{% if number == page_obj.number %} active{% endif %}">
+            <a
+              class="page-link"
+              href="?{% if search_query %}q={{ search_query|urlencode }}&{% endif %}page={{ number }}"
+            >
+              {{ number }}
+            </a>
+          </li>
+        {% endfor %}
+        <li class="page-item{% if not page_obj.has_next %} disabled{% endif %}">
+          <a
+            class="page-link"
+            href="{% if page_obj.has_next %}?{% if search_query %}q={{ search_query|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}{% else %}#{% endif %}"
+            tabindex="{% if page_obj.has_next %}0{% else %}-1{% endif %}"
+            aria-label="Próxima página"
+          >
+            »
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+{% endif %}
