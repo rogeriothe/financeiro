@@ -1,0 +1,15 @@
+:root {
+  --financeiro-bg: #f8f9fb;
+}
+
+body {
+  background-color: var(--financeiro-bg);
+}
+
+.card {
+  border-radius: 0.75rem;
+}
+
+.badge {
+  font-size: 0.75rem;
+}

@@ -1,0 +1,49 @@
+<tr id="entry-row-{{ entry.pk }}">
+  <td class="fw-semibold">{{ entry.description }}</td>
+  <td>{{ entry.category }}</td>
+  <td>
+    <span class="badge {% if entry.original_value >= 0 %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %}">
+      {{ entry.kind }}
+    </span>
+  </td>
+  <td class="text-end">
+    R$ {{ entry.original_value|floatformat:2 }}
+  </td>
+  <td class="text-end">
+    {% if entry.received_value %}
+      R$ {{ entry.received_value|floatformat:2 }}
+    {% else %}
+      <span class="text-muted">—</span>
+    {% endif %}
+  </td>
+  <td>{{ entry.due_date|date:"d/m/Y" }}</td>
+  <td>
+    {% if entry.payment_date %}
+      {{ entry.payment_date|date:"d/m/Y" }}
+    {% else %}
+      <span class="text-muted">—</span>
+    {% endif %}
+  </td>
+  <td>
+    <span class="badge {% if entry.payment_date %}bg-primary-subtle text-primary{% else %}bg-warning-subtle text-warning{% endif %}">
+      {{ entry.status }}
+    </span>
+  </td>
+  <td class="text-end">
+    <div class="d-flex justify-content-end gap-2">
+      <a class="btn btn-outline-secondary btn-sm" href="{% url 'entries:edit' entry.pk %}">
+        Editar
+      </a>
+      <form method="post" action="{% url 'entries:delete' entry.pk %}" class="d-inline">
+        {% csrf_token %}
+        <button
+          class="btn btn-outline-danger btn-sm"
+          type="submit"
+          onclick="return confirm('Deseja remover o lançamento?');"
+        >
+          Excluir
+        </button>
+      </form>
+    </div>
+  </td>
+</tr>
