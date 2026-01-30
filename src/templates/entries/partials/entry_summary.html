@@ -17,12 +17,21 @@
     </div>
   </div>
   <div class="col-sm-6 col-xl-3">
-    <div class="card border-primary-subtle">
-      <div class="card-body text-primary">
-        <h6 class="text-uppercase small fw-semibold">Liquidado</h6>
-        <p class="fs-4 mb-0">R$ {{ settled_total|floatformat:2 }}</p>
+    {% if result_total >= 0 %}
+      <div class="card border-success-subtle">
+        <div class="card-body text-success">
+          <h6 class="text-uppercase small fw-semibold">Resultado</h6>
+          <p class="fs-4 mb-0">R$ +{{ result_total|floatformat:2 }}</p>
+        </div>
       </div>
-    </div>
+    {% else %}
+      <div class="card border-danger-subtle">
+        <div class="card-body text-danger">
+          <h6 class="text-uppercase small fw-semibold">Resultado</h6>
+          <p class="fs-4 mb-0">R$ -{{ result_total|floatformat:2|slice:"1:" }}</p>
+        </div>
+      </div>
+    {% endif %}
   </div>
   <div class="col-sm-6 col-xl-3">
     <div class="card border-warning-subtle">

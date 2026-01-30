@@ -17,29 +17,21 @@ from .models import Entry
 
 
 def _totals_context() -> dict[str, Decimal]:
-    def _safe_total(queryset) -> Decimal:
-        return queryset.aggregate(total=Sum("original_value"))["total"] or Decimal("0.00")
+    def _safe_sum(queryset, field: str) -> Decimal:
+        return queryset.aggregate(total=Sum(field))["total"] or Decimal("0.00")
 
-    receivables_total = _safe_total(Entry.objects.receivables())
-    payables_total = abs(_safe_total(Entry.objects.payables()))
-    settled_total = abs(
-        (
-            Entry.objects.filter(payment_date__isnull=False).aggregate(total=Sum("received_value"))["total"]
-            or Decimal("0.00")
-        )
-    )
-    totals = Entry.objects.aggregate(
-        original_total=Sum("original_value"),
-        received_total=Sum("received_value"),
-    )
-    original_total = totals["original_total"] or Decimal("0.00")
-    received_total = totals["received_total"] or Decimal("0.00")
-    outstanding_total = original_total - received_total
+    receivables_total = _safe_sum(Entry.objects.receivables(), "original_value")
+    payables_total = abs(_safe_sum(Entry.objects.payables(), "original_value"))
+    result_total = _safe_sum(Entry.objects.settled(), "received_value")
+    receivables_received_total = _safe_sum(Entry.objects.receivables(), "received_value")
+    outstanding_total = receivables_total - receivables_received_total
+    if outstanding_total < 0:
+        outstanding_total = Decimal("0.00")
 
     return {
         "receivables_total": receivables_total,
         "payables_total": payables_total,
-        "settled_total": settled_total,
+        "result_total": result_total,
         "outstanding_total": outstanding_total,
     }
 
