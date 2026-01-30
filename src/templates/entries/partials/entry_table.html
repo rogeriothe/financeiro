@@ -34,6 +34,16 @@
   <div class="card-footer bg-body-tertiary">
     <nav aria-label="Paginação de lançamentos">
       <ul class="pagination justify-content-end mb-0">
+        <li class="page-item{% if page_obj.number == 1 %} disabled{% endif %}">
+          <a
+            class="page-link"
+            href="{% if page_obj.number != 1 %}?{% if search_query %}q={{ search_query|urlencode }}&{% endif %}page=1{% else %}#{% endif %}"
+            tabindex="{% if page_obj.number != 1 %}0{% else %}-1{% endif %}"
+            aria-label="Primeira página"
+          >
+            Primeiro
+          </a>
+        </li>
         <li class="page-item{% if not page_obj.has_previous %} disabled{% endif %}">
           <a
             class="page-link"
@@ -41,10 +51,10 @@
             tabindex="{% if page_obj.has_previous %}0{% else %}-1{% endif %}"
             aria-label="Página anterior"
           >
-            «
+            Anterior
           </a>
         </li>
-        {% for number in page_obj.paginator.page_range %}
+        {% for number in page_numbers %}
           <li class="page-item{% if number == page_obj.number %} active{% endif %}">
             <a
               class="page-link"
@@ -61,7 +71,17 @@
             tabindex="{% if page_obj.has_next %}0{% else %}-1{% endif %}"
             aria-label="Próxima página"
           >
-            »
+            Próxima
+          </a>
+        </li>
+        <li class="page-item{% if page_obj.number == page_obj.paginator.num_pages %} disabled{% endif %}">
+          <a
+            class="page-link"
+            href="{% if page_obj.number != page_obj.paginator.num_pages %}?{% if search_query %}q={{ search_query|urlencode }}&{% endif %}page={{ page_obj.paginator.num_pages }}{% else %}#{% endif %}"
+            tabindex="{% if page_obj.number != page_obj.paginator.num_pages %}0{% else %}-1{% endif %}"
+            aria-label="Última página"
+          >
+            Última
           </a>
         </li>
       </ul>

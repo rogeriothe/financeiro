@@ -20,7 +20,9 @@ class EntryForm(forms.ModelForm):
         ]
         widgets = {
             "description": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ex.: Mensalidade de agosto"}),
-            "category": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ex.: Mensalidades"}),
+            "category": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Ex.: Mensalidades", "list": "category-list"}
+            ),
             "due_date": forms.DateInput(format="%Y-%m-%d", attrs={"type": "date", "class": "form-control"}),
             "original_value": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
             "received_value": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
