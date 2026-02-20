@@ -1,6 +1,7 @@
 <tr id="entry-row-{{ entry.pk }}">
   <td class="fw-semibold">{{ entry.description }}</td>
   <td>{{ entry.category }}</td>
+  <td>{{ entry.cost_center|default:"—" }}</td>
   <td>
     <span class="badge {% if entry.original_value >= 0 %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %}">
       {{ entry.kind }}

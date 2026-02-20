@@ -20,9 +20,58 @@ class EntryQuerySet(models.QuerySet):
         return self.filter(payment_date__isnull=False)
 
 
+class CostCenter(models.Model):
+    description = models.CharField("Descrição", max_length=255, unique=True)
+
+    class Meta:
+        ordering = ["description"]
+        verbose_name = "centro de custo"
+        verbose_name_plural = "centros de custo"
+
+    def __str__(self) -> str:  # pragma: no cover - human readable
+        return self.description
+
+
+class Category(models.Model):
+    description = models.CharField("Descrição", max_length=100, unique=True)
+
+    class Meta:
+        ordering = ["description"]
+        verbose_name = "categoria"
+        verbose_name_plural = "categorias"
+
+    def __str__(self) -> str:  # pragma: no cover - human readable
+        return self.description
+
+
 class Entry(models.Model):
+    class PaymentMethod(models.TextChoices):
+        PIX = "PIX", "PIX"
+        CASH = "Espécie", "Espécie"
+        CREDIT = "Crédito", "Crédito"
+        DEBIT = "Débito", "Débito"
+
     description = models.CharField("Descrição", max_length=255)
-    category = models.CharField("Categoria", max_length=100)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.PROTECT,
+        related_name="entries",
+        verbose_name="Categoria",
+    )
+    cost_center = models.ForeignKey(
+        CostCenter,
+        on_delete=models.PROTECT,
+        related_name="entries",
+        verbose_name="Centro de custo",
+        null=True,
+        blank=True,
+    )
+    forma_pagamento = models.CharField(
+        "Forma de pagamento",
+        max_length=20,
+        choices=PaymentMethod.choices,
+        default=PaymentMethod.PIX,
+    )
     due_date = models.DateField("Data de vencimento")
     original_value = models.DecimalField(
         "Valor original",

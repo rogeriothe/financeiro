@@ -4,13 +4,6 @@
     <div class="mb-3">
       <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
       {{ field }}
-      {% if field.name == "category" %}
-        <datalist id="category-list">
-          {% for category in category_suggestions %}
-            <option value="{{ category }}"></option>
-          {% endfor %}
-        </datalist>
-      {% endif %}
       {% if field.help_text %}
         <div class="form-text">{{ field.help_text }}</div>
       {% endif %}

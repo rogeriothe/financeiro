@@ -3,14 +3,51 @@
     <table class="table table-striped align-middle mb-0">
       <thead class="table-light">
         <tr>
-          <th>Descrição</th>
-          <th>Categoria</th>
-          <th>Tipo</th>
-          <th class="text-end">Valor original</th>
-          <th class="text-end">Valor recebido</th>
-          <th>Vencimento</th>
-          <th>Pagamento</th>
-          <th>Status</th>
+          <th>
+            <a class="link-dark text-decoration-none" href="?{{ sort_links.description }}">
+              Descrição{% if sort_by == "description" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+            </a>
+          </th>
+          <th>
+            <a class="link-dark text-decoration-none" href="?{{ sort_links.category }}">
+              Categoria{% if sort_by == "category" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+            </a>
+          </th>
+          <th>
+            <a class="link-dark text-decoration-none" href="?{{ sort_links.cost_center }}">
+              Centro de custo{% if sort_by == "cost_center" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+            </a>
+          </th>
+          <th>
+            <a class="link-dark text-decoration-none" href="?{{ sort_links.kind }}">
+              Tipo{% if sort_by == "kind" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+            </a>
+          </th>
+          <th class="text-end">
+            <a class="link-dark text-decoration-none" href="?{{ sort_links.original_value }}">
+              Valor original{% if sort_by == "original_value" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+            </a>
+          </th>
+          <th class="text-end">
+            <a class="link-dark text-decoration-none" href="?{{ sort_links.received_value }}">
+              Valor recebido{% if sort_by == "received_value" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+            </a>
+          </th>
+          <th>
+            <a class="link-dark text-decoration-none" href="?{{ sort_links.due_date }}">
+              Vencimento{% if sort_by == "due_date" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+            </a>
+          </th>
+          <th>
+            <a class="link-dark text-decoration-none" href="?{{ sort_links.payment_date }}">
+              Pagamento{% if sort_by == "payment_date" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+            </a>
+          </th>
+          <th>
+            <a class="link-dark text-decoration-none" href="?{{ sort_links.status }}">
+              Status{% if sort_by == "status" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+            </a>
+          </th>
           <th></th>
         </tr>
       </thead>
@@ -21,7 +58,7 @@
           {% endfor %}
         {% else %}
           <tr>
-            <td colspan="9" class="text-center text-muted py-4">
+            <td colspan="10" class="text-center text-muted py-4">
               Nenhum lançamento cadastrado.
             </td>
           </tr>
@@ -37,7 +74,7 @@
         <li class="page-item{% if page_obj.number == 1 %} disabled{% endif %}">
           <a
             class="page-link"
-            href="{% if page_obj.number != 1 %}?{% if search_query %}q={{ search_query|urlencode }}&{% endif %}page=1{% else %}#{% endif %}"
+            href="{% if page_obj.number != 1 %}?{{ pagination_links.first }}{% else %}#{% endif %}"
             tabindex="{% if page_obj.number != 1 %}0{% else %}-1{% endif %}"
             aria-label="Primeira página"
           >
@@ -47,18 +84,18 @@
         <li class="page-item{% if not page_obj.has_previous %} disabled{% endif %}">
           <a
             class="page-link"
-            href="{% if page_obj.has_previous %}?{% if search_query %}q={{ search_query|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}{% else %}#{% endif %}"
+            href="{% if page_obj.has_previous %}?{{ pagination_links.previous }}{% else %}#{% endif %}"
             tabindex="{% if page_obj.has_previous %}0{% else %}-1{% endif %}"
             aria-label="Página anterior"
           >
             Anterior
           </a>
         </li>
-        {% for number in page_numbers %}
+        {% for number, page_link in pagination_links.pages %}
           <li class="page-item{% if number == page_obj.number %} active{% endif %}">
             <a
               class="page-link"
-              href="?{% if search_query %}q={{ search_query|urlencode }}&{% endif %}page={{ number }}"
+              href="?{{ page_link }}"
             >
               {{ number }}
             </a>
@@ -67,7 +104,7 @@
         <li class="page-item{% if not page_obj.has_next %} disabled{% endif %}">
           <a
             class="page-link"
-            href="{% if page_obj.has_next %}?{% if search_query %}q={{ search_query|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}{% else %}#{% endif %}"
+            href="{% if page_obj.has_next %}?{{ pagination_links.next }}{% else %}#{% endif %}"
             tabindex="{% if page_obj.has_next %}0{% else %}-1{% endif %}"
             aria-label="Próxima página"
           >
@@ -77,7 +114,7 @@
         <li class="page-item{% if page_obj.number == page_obj.paginator.num_pages %} disabled{% endif %}">
           <a
             class="page-link"
-            href="{% if page_obj.number != page_obj.paginator.num_pages %}?{% if search_query %}q={{ search_query|urlencode }}&{% endif %}page={{ page_obj.paginator.num_pages }}{% else %}#{% endif %}"
+            href="{% if page_obj.number != page_obj.paginator.num_pages %}?{{ pagination_links.last }}{% else %}#{% endif %}"
             tabindex="{% if page_obj.number != page_obj.paginator.num_pages %}0{% else %}-1{% endif %}"
             aria-label="Última página"
           >

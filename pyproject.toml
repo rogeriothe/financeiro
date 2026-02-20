@@ -9,6 +9,7 @@ dependencies = [
     "django>=5.2.7",
     "psycopg-binary>=3.2.11",
     "psycopg2-binary>=2.9.11",
+    "python-telegram-bot>=22.5",
     "python-dotenv>=1.1.1",
 ]
 

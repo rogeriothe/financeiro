@@ -46,17 +46,36 @@
           action="{% url 'entries:list' %}"
           class="ms-auto"
         >
-          <div class="input-group">
-            <input
-              type="search"
-              name="q"
-              class="form-control"
-              placeholder="Buscar descrição..."
-              value="{{ search_query }}"
-            />
-            <button class="btn btn-outline-secondary" type="submit">
-              Buscar
-            </button>
+          <div class="row g-2">
+            <div class="col-12 col-md">
+              <input
+                type="search"
+                name="q"
+                class="form-control"
+                placeholder="Buscar descrição..."
+                value="{{ search_query }}"
+              />
+            </div>
+            <div class="col-12 col-md-auto">
+              <select name="cost_center" class="form-select">
+                <option value="">Todos centros de custo</option>
+                {% for cost_center in cost_centers %}
+                  <option
+                    value="{{ cost_center.pk }}"
+                    {% if selected_cost_center == cost_center.pk|stringformat:"s" %}selected{% endif %}
+                  >
+                    {{ cost_center.description }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <input type="hidden" name="sort" value="{{ sort_by }}" />
+            <input type="hidden" name="dir" value="{{ sort_direction }}" />
+            <div class="col-12 col-md-auto">
+              <button class="btn btn-outline-secondary w-100" type="submit">
+                Filtrar
+              </button>
+            </div>
           </div>
         </form>
       </div>

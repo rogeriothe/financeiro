@@ -6,8 +6,8 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql://financeiro:financeiro@db:5432/financeiro
-      DJANGO_DEBUG: "false"
+      DATABASE_URL: ${DATABASE_URL:-postgresql://financeiro:financeiro@db:5432/financeiro}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-false}
     volumes:
       - .:/app
     ports:
@@ -17,12 +17,29 @@ services:
       db:
         condition: service_healthy
 
+  telegram-bot:
+    build: .
+    command: uv run python src/manage.py run_telegram_bot
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://financeiro:financeiro@db:5432/financeiro}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-false}
+    volumes:
+      - .:/app
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+
   db:
     image: postgres:16-alpine
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: financeiro
-      POSTGRES_USER: financeiro
-      POSTGRES_PASSWORD: financeiro
+      POSTGRES_DB: ${POSTGRES_DB:-financeiro}
+      POSTGRES_USER: ${POSTGRES_USER:-financeiro}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-financeiro}
     volumes:
       - ./pg_data:/var/lib/postgresql/data
     restart: always

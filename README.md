@@ -21,6 +21,23 @@ uv run python src/manage.py runserver
 
 A aplicação ficará disponível em `http://127.0.0.1:8000`. O acesso requer autenticação; utilize o usuário criado via `createsuperuser`. Para adicionar outros usuários, repita o comando ou use o admin (`/admin/`).
 
+### Bot do Telegram
+
+Defina no `.env`:
+
+```bash
+TELEGRAM_BOT_TOKEN=seu_token_do_botfather
+TELEGRAM_ALLOWED_USER_IDS=123456789,987654321
+```
+
+`TELEGRAM_ALLOWED_USER_IDS` é opcional. Quando vazio, qualquer usuário que descobrir o bot poderá conversar com ele.
+
+Para rodar localmente sem Docker:
+
+```bash
+uv run python src/manage.py run_telegram_bot
+```
+
 ## Executando com Docker
 
 ```bash
@@ -29,6 +46,7 @@ docker compose up --build
 ```
 
 O serviço web utiliza `uv` dentro do container e depende do PostgreSQL 16 definido em `docker-compose.yml`.
+O `docker-compose.yml` também sobe o serviço `telegram-bot`, usando as variáveis do `.env`.
 
 ## Estrutura principal
 

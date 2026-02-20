@@ -1,10 +1,31 @@
 [
   {
+    "model": "entries.category",
+    "pk": 1,
+    "fields": {
+      "description": "Mensalidades"
+    }
+  },
+  {
+    "model": "entries.category",
+    "pk": 2,
+    "fields": {
+      "description": "Serviços"
+    }
+  },
+  {
+    "model": "entries.category",
+    "pk": 3,
+    "fields": {
+      "description": "Treinamentos"
+    }
+  },
+  {
     "model": "entries.entry",
     "pk": 1,
     "fields": {
       "description": "Mensalidade julho",
-      "category": "Mensalidades",
+      "category": 1,
       "due_date": "2024-07-10",
       "original_value": "220.00",
       "received_value": "220.00",
@@ -18,7 +39,7 @@
     "pk": 2,
     "fields": {
       "description": "Fornecedor de internet",
-      "category": "Serviços",
+      "category": 2,
       "due_date": "2024-07-15",
       "original_value": "-150.00",
       "received_value": "-150.00",
@@ -32,7 +53,7 @@
     "pk": 3,
     "fields": {
       "description": "Curso online",
-      "category": "Treinamentos",
+      "category": 3,
       "due_date": "2024-08-20",
       "original_value": "-400.00",
       "received_value": null,
