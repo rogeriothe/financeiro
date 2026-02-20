@@ -32,6 +32,7 @@ logger = logging.getLogger(__name__)
     STATE_CATEGORY,
     STATE_COST_CENTER,
     STATE_PAYMENT_METHOD,
+    STATE_DUE_DATE_TODAY,
     STATE_DUE_DATE,
     STATE_ORIGINAL_VALUE,
     STATE_SETTLED_CASH,
@@ -39,7 +40,7 @@ logger = logging.getLogger(__name__)
     STATE_PAYMENT_DATE,
     STATE_RECEIVED_VALUE,
     STATE_CONFIRMATION,
-) = range(12)
+) = range(13)
 
 
 @dataclass(frozen=True)
@@ -107,6 +108,17 @@ def _settled_cash_keyboard() -> InlineKeyboardMarkup:
             [
                 InlineKeyboardButton("Sim", callback_data="settled_cash:sim"),
                 InlineKeyboardButton("Não", callback_data="settled_cash:nao"),
+            ]
+        ]
+    )
+
+
+def _due_today_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton("Sim", callback_data="due_today:sim"),
+                InlineKeyboardButton("Não", callback_data="due_today:nao"),
             ]
         ]
     )
@@ -399,6 +411,28 @@ async def _payment_method_handler(
         return STATE_PAYMENT_METHOD
     context.user_data["forma_pagamento"] = selected.value
     context.user_data["forma_pagamento_label"] = selected.label
+    await query.edit_message_text(
+        "O vencimento foi hoje?",
+        reply_markup=_due_today_keyboard(),
+    )
+    return STATE_DUE_DATE_TODAY
+
+
+async def _due_date_today_handler(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+) -> int:
+    query = update.callback_query
+    if not query:
+        return STATE_DUE_DATE_TODAY
+    await query.answer()
+    _, selection = query.data.split(":", maxsplit=1)
+    if selection == "sim":
+        context.user_data["due_date"] = date.today()
+        await query.edit_message_text(
+            "Informe o valor (apenas número positivo, ex: 250,90):"
+        )
+        return STATE_ORIGINAL_VALUE
     await query.edit_message_text("Informe a data de vencimento (DD/MM/AAAA):")
     return STATE_DUE_DATE
 
@@ -584,6 +618,12 @@ def build_application(bot_token: str) -> Application:
             ],
             STATE_PAYMENT_METHOD: [
                 CallbackQueryHandler(_payment_method_handler, pattern=r"^pm:")
+            ],
+            STATE_DUE_DATE_TODAY: [
+                CallbackQueryHandler(
+                    _due_date_today_handler,
+                    pattern=r"^due_today:",
+                )
             ],
             STATE_DUE_DATE: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, _due_date_handler)
