@@ -145,6 +145,11 @@ def _categories() -> list[Category]:
     return list(Category.objects.order_by("description"))
 
 
+@sync_to_async
+def _latest_entries(limit: int = 10) -> list[Entry]:
+    return list(Entry.objects.order_by("-created_at", "-pk")[:limit])
+
+
 def _category_keyboard(categories: list[Category]) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         [
@@ -230,6 +235,10 @@ def _entry_payload(user_data: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _format_brl(value: Decimal) -> str:
+    return f"{value:.2f}".replace(".", ",")
+
+
 def _summary(user_data: dict[str, Any]) -> str:
     kind_label = "Recebimento" if user_data["kind"] == "recebendo" else "Pagamento"
     amount = user_data["original_value"]
@@ -267,6 +276,32 @@ def _create_entry_from_payload(
     return None, cleaned_errors
 
 
+async def _list_entries(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    del context
+    user = update.effective_user
+    if not user or not _is_authorized(user.id):
+        if update.message:
+            await update.message.reply_text(
+                "Seu usuário não está autorizado para este bot."
+            )
+        return
+
+    entries = await _latest_entries()
+    if not update.message:
+        return
+    if not entries:
+        await update.message.reply_text("Nenhum lançamento encontrado.")
+        return
+
+    lines = ["Últimos 10 lançamentos:"]
+    for entry in entries:
+        lines.append(
+            f"- {entry.description} | {entry.due_date:%d/%m/%Y} | "
+            f"R$ {_format_brl(entry.original_value)}"
+        )
+    await update.message.reply_text("\n".join(lines))
+
+
 async def _start_conversation(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
@@ -282,7 +317,9 @@ async def _start_conversation(
     context.user_data.clear()
     if update.message:
         await update.message.reply_text(
-            "Vamos cadastrar um lançamento.\nVocê está pagando ou recebendo?",
+            "Vamos cadastrar um lançamento.\n"
+            "Você está pagando ou recebendo?\n"
+            "Use /lista para ver os últimos 10 lançamentos.",
             reply_markup=_kind_keyboard(),
         )
     return STATE_KIND
@@ -597,6 +634,7 @@ async def _cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 def build_application(bot_token: str) -> Application:
     application = Application.builder().token(bot_token).build()
+    application.add_handler(CommandHandler("lista", _list_entries))
     conversation = ConversationHandler(
         entry_points=[
             CommandHandler("start", _start_conversation),

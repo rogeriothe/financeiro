@@ -1,4 +1,4 @@
-.PHONY: up down restart migrate collectstatic
+.PHONY: up down restart migrate collectstatic backupdb
 
 up:
 	docker compose up --build -d
@@ -17,3 +17,8 @@ migrate:
 
 collectstatic:
 	docker compose exec web uv run python src/manage.py collectstatic --noinput
+
+backupdb:
+	@mkdir -p backups
+	@docker compose exec -T db sh -c 'pg_dump -U "$$POSTGRES_USER" "$$POSTGRES_DB"' > backups/backup_$$(date +%Y%m%d_%H%M%S).sql
+	@echo "Backup gerado em backups/"
