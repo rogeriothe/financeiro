@@ -5,8 +5,12 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql://financeiro:financeiro@db:5432/financeiro}
       DJANGO_DEBUG: ${DJANGO_DEBUG:-false}
+      POSTGRES_DB: ${POSTGRES_DB:-financeiro}
+      POSTGRES_USER: ${POSTGRES_USER:-financeiro}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-financeiro}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
     volumes:
       - staticfiles:/app/staticfiles
     expose:
@@ -35,8 +39,12 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql://financeiro:financeiro@db:5432/financeiro}
       DJANGO_DEBUG: ${DJANGO_DEBUG:-false}
+      POSTGRES_DB: ${POSTGRES_DB:-financeiro}
+      POSTGRES_USER: ${POSTGRES_USER:-financeiro}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-financeiro}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
     restart: always
     depends_on:
       db:
