@@ -3,8 +3,8 @@
   <td>{{ entry.category }}</td>
   <td>{{ entry.cost_center|default:"—" }}</td>
   <td>
-    <span class="badge {% if entry.original_value >= 0 %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %}">
-      {{ entry.kind }}
+    <span class="badge {% if entry.original_value >= 0 %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %}" title="{{ entry.kind }}">
+      {% if entry.original_value >= 0 %}&#9650;{% else %}&#9660;{% endif %}
     </span>
   </td>
   <td class="text-end">
