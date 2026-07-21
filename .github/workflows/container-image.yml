@@ -1,0 +1,101 @@
+name: Build container image
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+concurrency:
+  group: container-image-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BASE_IMAGE: ghcr.io/astral-sh/uv:python3.12-alpine
+  REGISTRY: ghcr.io
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Define image metadata
+        id: image
+        shell: bash
+        run: |
+          image="${REGISTRY}/${GITHUB_REPOSITORY,,}"
+          tag="sha-${GITHUB_SHA::12}"
+          echo "name=${image}" >> "${GITHUB_OUTPUT}"
+          echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
+          echo "ref=${image}:${tag}" >> "${GITHUB_OUTPUT}"
+
+      - name: Build Alpine image without Dockerfile
+        shell: bash
+        env:
+          IMAGE_REF: ${{ steps.image.outputs.ref }}
+        run: |
+          set -euo pipefail
+
+          container="$(buildah from "${BASE_IMAGE}")"
+          trap 'buildah rm "${container}"' EXIT
+
+          buildah config --workingdir /app "${container}"
+          buildah copy "${container}" pyproject.toml uv.lock README.md /app/
+          buildah copy "${container}" src /app/src
+          buildah run "${container}" -- uv sync --frozen --no-dev
+
+          buildah config \
+            --env DJANGO_SETTINGS_MODULE=financeiro_project.settings \
+            --env PYTHONUNBUFFERED=1 \
+            --env PORT=8000 \
+            --label "org.opencontainers.image.revision=${GITHUB_SHA}" \
+            --label "org.opencontainers.image.source=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --port 8000 \
+            --entrypoint '["/app/.venv/bin/python"]' \
+            --cmd '["src/manage.py","runserver","0.0.0.0:8000"]' \
+            "${container}"
+
+          buildah commit "${container}" "${IMAGE_REF}"
+
+      - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        shell: bash
+        env:
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "${REGISTRY_TOKEN}" | buildah login \
+            --username "${GITHUB_ACTOR}" \
+            --password-stdin \
+            "${REGISTRY}"
+
+      - name: Push image
+        if: github.event_name != 'pull_request'
+        shell: bash
+        env:
+          IMAGE_NAME: ${{ steps.image.outputs.name }}
+          IMAGE_REF: ${{ steps.image.outputs.ref }}
+        run: |
+          set -euo pipefail
+
+          buildah push "${IMAGE_REF}"
+
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            version="${GITHUB_REF_NAME#v}"
+            buildah tag "${IMAGE_REF}" "${IMAGE_NAME}:${version}"
+            buildah push "${IMAGE_NAME}:${version}"
+          elif [[ "${GITHUB_REF_NAME}" == "main" || "${GITHUB_REF_NAME}" == "master" ]]; then
+            buildah tag "${IMAGE_REF}" "${IMAGE_NAME}:latest"
+            buildah push "${IMAGE_NAME}:latest"
+          fi
