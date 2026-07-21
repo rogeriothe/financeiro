@@ -63,8 +63,8 @@ jobs:
             --label "org.opencontainers.image.revision=${GITHUB_SHA}" \
             --label "org.opencontainers.image.source=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
             --port 8000 \
-            --entrypoint '["/app/.venv/bin/python"]' \
-            --cmd '["src/manage.py","runserver","0.0.0.0:8000"]' \
+            --entrypoint '[]' \
+            --cmd '["/app/.venv/bin/python","src/manage.py","runserver","0.0.0.0:8000"]' \
             "${container}"
 
           buildah commit "${container}" "${IMAGE_REF}"

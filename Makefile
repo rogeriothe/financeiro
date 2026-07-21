@@ -1,7 +1,7 @@
 .PHONY: up down restart migrate collectstatic backupdb
 
 up:
-	docker compose up --build -d
+	docker compose up --build -d --wait --wait-timeout 60
 	$(MAKE) collectstatic
 
 down:

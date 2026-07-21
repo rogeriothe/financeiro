@@ -2,6 +2,7 @@
 services:
   web:
     build: .
+    entrypoint: []
     command: uv run python src/manage.py runserver 0.0.0.0:8000
     env_file:
       - .env
@@ -10,13 +11,27 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-financeiro}
       POSTGRES_USER: ${POSTGRES_USER:-financeiro}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-financeiro}
-      POSTGRES_HOST: ${POSTGRES_HOST:-db}
+      POSTGRES_HOST: db
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
     volumes:
       - .:/app
     expose:
       - "8000"
     restart: always
+    healthcheck:
+      test:
+        - CMD
+        - uv
+        - run
+        - python
+        - -c
+        - >-
+          import urllib.request;
+          urllib.request.urlopen('http://localhost:8000/login/', timeout=2)
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
     depends_on:
       db:
         condition: service_healthy
@@ -35,6 +50,7 @@ services:
 
   telegram-bot:
     build: .
+    entrypoint: []
     command: uv run python src/manage.py run_telegram_bot
     env_file:
       - .env
@@ -43,7 +59,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-financeiro}
       POSTGRES_USER: ${POSTGRES_USER:-financeiro}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-financeiro}
-      POSTGRES_HOST: ${POSTGRES_HOST:-db}
+      POSTGRES_HOST: db
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
     volumes:
       - .:/app
