@@ -1,9 +1,24 @@
-<form method="post" action="{{ form_action }}" novalidate>
+<form method="post" action="{{ form_action }}" enctype="multipart/form-data" novalidate>
   {% csrf_token %}
   {% for field in form %}
     <div class="mb-3">
       <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-      {{ field }}
+      {% if field.name == "tipo_lancamento" %}
+        <div class="btn-group w-100" role="group" aria-label="Tipo de lançamento">
+          {% for option in field %}
+            {{ option.tag }}
+            <label
+              class="btn {% if option.data.value == 'pagar' %}btn-outline-danger{% else %}btn-outline-success{% endif %}"
+              for="{{ option.id_for_label }}"
+            >
+              <span aria-hidden="true">{% if option.data.value == 'pagar' %}&darr;{% else %}&uarr;{% endif %}</span>
+              {{ option.choice_label }}
+            </label>
+          {% endfor %}
+        </div>
+      {% else %}
+        {{ field }}
+      {% endif %}
       {% if field.help_text %}
         <div class="form-text">{{ field.help_text }}</div>
       {% endif %}

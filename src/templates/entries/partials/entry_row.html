@@ -30,6 +30,19 @@
       {{ entry.status }}
     </span>
   </td>
+  <td>
+    <div class="d-flex flex-column gap-1">
+      {% if entry.fatura %}
+        <a href="{{ entry.fatura.url }}" target="_blank" rel="noopener">Fatura</a>
+      {% endif %}
+      {% if entry.comprovante %}
+        <a href="{{ entry.comprovante.url }}" target="_blank" rel="noopener">Comprovante</a>
+      {% endif %}
+      {% if not entry.fatura and not entry.comprovante %}
+        <span class="text-muted">—</span>
+      {% endif %}
+    </div>
+  </td>
   <td class="text-end">
     <div class="d-flex justify-content-end gap-2">
       <a class="btn btn-outline-secondary btn-sm" href="{% url 'entries:edit' entry.pk %}">

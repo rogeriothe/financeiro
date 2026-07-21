@@ -244,7 +244,7 @@ def entry_summary(request: HttpRequest) -> HttpResponse:
 @login_required
 @require_POST
 def entry_create(request: HttpRequest) -> HttpResponse:
-    form = EntryForm(request.POST)
+    form = EntryForm(request.POST, request.FILES)
     if form.is_valid():
         entry = form.save()
         messages.success(request, f"Lançamento '{entry.description}' criado com sucesso.")
@@ -264,7 +264,7 @@ def entry_create(request: HttpRequest) -> HttpResponse:
 def entry_edit(request: HttpRequest, pk: int) -> HttpResponse:
     entry = get_object_or_404(Entry, pk=pk)
     if request.method == "POST":
-        form = EntryForm(request.POST, instance=entry)
+        form = EntryForm(request.POST, request.FILES, instance=entry)
         if form.is_valid():
             entry = form.save()
             messages.success(request, f"Lançamento '{entry.description}' atualizado.")

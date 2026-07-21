@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils import timezone
 
@@ -78,6 +79,20 @@ class Entry(models.Model):
         help_text="Preencha quando o valor for liquidado. Use o mesmo sinal do valor original.",
     )
     payment_date = models.DateField("Data de pagamento", null=True, blank=True)
+    fatura = models.FileField(
+        "Fatura",
+        upload_to="entries/faturas/",
+        validators=[FileExtensionValidator(["pdf", "png", "jpg", "jpeg"])],
+        null=True,
+        blank=True,
+    )
+    comprovante = models.FileField(
+        "Comprovante",
+        upload_to="entries/comprovantes/",
+        validators=[FileExtensionValidator(["pdf", "png", "jpg", "jpeg"])],
+        null=True,
+        blank=True,
+    )
     created_at = models.DateTimeField("Criado em", auto_now_add=True)
     updated_at = models.DateTimeField("Atualizado em", auto_now=True)
 

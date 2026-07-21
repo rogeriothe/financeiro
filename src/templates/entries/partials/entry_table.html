@@ -48,6 +48,7 @@
               Status{% if sort_by == "status" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
             </a>
           </th>
+          <th style="width: 110px;">Anexos</th>
           <th style="width: 120px;"></th>
         </tr>
       </thead>
@@ -58,7 +59,7 @@
           {% endfor %}
         {% else %}
           <tr>
-            <td colspan="10" class="text-center text-muted py-4">
+            <td colspan="11" class="text-center text-muted py-4">
               Nenhum lançamento cadastrado.
             </td>
           </tr>

@@ -210,22 +210,18 @@ def _parse_date(raw_value: str) -> date | None:
     return None
 
 
-def _signed_amount(kind: str, amount: Decimal) -> Decimal:
-    return -amount if kind == "pagando" else amount
-
-
 def _entry_payload(user_data: dict[str, Any]) -> dict[str, Any]:
-    original_value = _signed_amount(user_data["kind"], user_data["original_value"])
     received_value = user_data.get("received_value")
-    if received_value is not None:
-        received_value = _signed_amount(user_data["kind"], received_value)
     return {
         "description": user_data["description"],
         "category": user_data["category"],
         "cost_center": user_data.get("cost_center"),
         "forma_pagamento": user_data["forma_pagamento"],
         "due_date": user_data["due_date"].isoformat(),
-        "original_value": str(original_value),
+        "tipo_lancamento": (
+            EntryForm.PAY if user_data["kind"] == "pagando" else EntryForm.RECEIVE
+        ),
+        "original_value": str(user_data["original_value"]),
         "received_value": str(received_value) if received_value is not None else None,
         "payment_date": (
             user_data["payment_date"].isoformat()
