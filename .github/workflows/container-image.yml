@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  BASE_IMAGE: ghcr.io/astral-sh/uv:python3.12-alpine
+  BASE_IMAGE: ghcr.io/astral-sh/uv:python3.12-bookworm
   REGISTRY: ghcr.io
 
 jobs:
@@ -41,7 +41,7 @@ jobs:
           echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
           echo "ref=${image}:${tag}" >> "${GITHUB_OUTPUT}"
 
-      - name: Build Alpine image without Dockerfile
+      - name: Build image without Dockerfile
         shell: bash
         env:
           IMAGE_REF: ${{ steps.image.outputs.ref }}
