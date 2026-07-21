@@ -1,6 +1,6 @@
 {% load humanize %}
 <div class="row g-3">
-  <div class="col-sm-6 col-xl-4">
+  <div class="col-sm-6 col-xl-2">
     <div class="card border-success-subtle">
       <div class="card-body text-success">
         <h6 class="text-uppercase small fw-semibold">Receitas previstas</h6>
@@ -8,7 +8,7 @@
       </div>
     </div>
   </div>
-  <div class="col-sm-6 col-xl-4">
+  <div class="col-sm-6 col-xl-2">
     <div class="card border-success-subtle">
       <div class="card-body text-success">
         <h6 class="text-uppercase small fw-semibold">Receitas realizadas</h6>
@@ -16,7 +16,7 @@
       </div>
     </div>
   </div>
-  <div class="col-sm-6 col-xl-4">
+  <div class="col-sm-6 col-xl-2">
     <div class="card border-danger-subtle">
       <div class="card-body text-danger">
         <h6 class="text-uppercase small fw-semibold">Despesas previstas</h6>
@@ -24,7 +24,7 @@
       </div>
     </div>
   </div>
-  <div class="col-sm-6 col-xl-4">
+  <div class="col-sm-6 col-xl-2">
     <div class="card border-danger-subtle">
       <div class="card-body text-danger">
         <h6 class="text-uppercase small fw-semibold">Despesas realizadas</h6>
@@ -32,7 +32,7 @@
       </div>
     </div>
   </div>
-  <div class="col-sm-6 col-xl-4">
+  <div class="col-sm-6 col-xl-2">
     {% if resultado_previsto >= 0 %}
       <div class="card border-success-subtle">
         <div class="card-body text-success">
@@ -49,7 +49,7 @@
       </div>
     {% endif %}
   </div>
-  <div class="col-sm-6 col-xl-4">
+  <div class="col-sm-6 col-xl-2">
     {% if resultado_realizado >= 0 %}
       <div class="card border-success-subtle">
         <div class="card-body text-success">
