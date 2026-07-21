@@ -51,7 +51,9 @@ O `docker-compose.yml` também sobe o serviço `telegram-bot`, usando as variáv
 ## Estrutura principal
 
 - `src/financeiro_project/` — configurações globais do Django, formulários compartilhados e URLs do projeto.
+- `src/core/` — app com modelos compartilhados entre domínios, começando por categorias.
 - `src/entries/` — app responsável pelos lançamentos (modelos, formulários, views, templates e fixtures).
+- `src/cartao/` — app responsável por cartões de crédito e gastos parcelados.
 - `src/templates/` — templates base, telas HTML e página de login.
 - `src/static/` — ativos estáticos (CSS, imagens).
 

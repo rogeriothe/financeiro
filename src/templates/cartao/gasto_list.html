@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Gastos do cartão{% endblock %}
+
+{% block content %}
+  <div
+    class="row g-4 align-items-start"
+    id="gastos-layout"
+    data-start-visible="{% if form_visible %}true{% else %}false{% endif %}"
+  >
+    <div class="col-lg-4{% if not form_visible %} d-none{% endif %}" id="gasto-form-column">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h5 class="mb-0">
+            {% if editing_gasto %}
+              Editar gasto
+            {% else %}
+              Novo gasto
+            {% endif %}
+          </h5>
+        </div>
+        <div class="card-body">
+          <div id="gasto-form">
+            {% include "cartao/partials/gasto_form.html" %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-{% if form_visible %}8{% else %}12{% endif %}" id="gastos-column">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+        <div class="d-flex gap-2">
+          <button
+            type="button"
+            class="btn btn-primary{% if form_visible %} d-none{% endif %}"
+            id="toggle-gasto-form-btn"
+          >
+            Novo
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-primary"
+            id="toggle-import-form-btn"
+          >
+            Importar fatura PDF
+          </button>
+        </div>
+        <form
+          method="get"
+          action="{% url 'cartao:gasto_list' %}"
+          class="ms-auto"
+        >
+          <div class="row g-2">
+            <div class="col-12 col-md">
+              <input
+                type="search"
+                name="q"
+                class="form-control"
+                placeholder="Buscar descrição..."
+                value="{{ search_query }}"
+              />
+            </div>
+            <div class="col-12 col-md-auto">
+              <select name="cartao" class="form-select">
+                <option value="">Todos os cartões</option>
+                {% for cartao in cartoes %}
+                  <option
+                    value="{{ cartao.pk }}"
+                    {% if selected_cartao == cartao.pk|stringformat:"s" %}selected{% endif %}
+                  >
+                    {{ cartao.nome_apelido }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12 col-md-auto">
+              <select name="categoria" class="form-select">
+                <option value="">Todas categorias</option>
+                {% for categoria in categorias %}
+                  <option
+                    value="{{ categoria.pk }}"
+                    {% if selected_categoria == categoria.pk|stringformat:"s" %}selected{% endif %}
+                  >
+                    {{ categoria.description }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12 col-md-auto">
+              <select name="competencia" class="form-select">
+                <option value="">Todas competências</option>
+                {% for competencia in competencias %}
+                  <option value="{{ competencia }}" {% if selected_competencia == competencia %}selected{% endif %}>
+                    {{ competencia }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <input type="hidden" name="sort" value="{{ sort_by }}" />
+            <input type="hidden" name="dir" value="{{ sort_direction }}" />
+            <div class="col-12 col-md-auto">
+              <button class="btn btn-outline-secondary w-100" type="submit">
+                Filtrar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="card shadow-sm mb-3 d-none" id="import-form-card">
+        <div class="card-header">
+          <h5 class="mb-0">Importar fatura PDF</h5>
+        </div>
+        <div class="card-body">
+          {% include "cartao/partials/import_form.html" %}
+        </div>
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-md-4">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <small class="text-muted d-block">Limite total</small>
+              <strong>R$ {{ limite_total|floatformat:2|intcomma }}</strong>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <small class="text-muted d-block">Limite utilizado</small>
+              <strong>R$ {{ limite_utilizado|floatformat:2|intcomma }}</strong>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <small class="text-muted d-block">Página atual</small>
+              <strong>R$ {{ total_gastos|floatformat:2|intcomma }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mt-4">
+        <div class="card-header">
+          <h5 class="mb-0">Gastos</h5>
+        </div>
+        {% include "cartao/partials/gasto_table.html" %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script>
+    (function () {
+      const layout = document.getElementById("gastos-layout");
+      const formColumn = document.getElementById("gasto-form-column");
+      const gastosColumn = document.getElementById("gastos-column");
+      const toggleBtn = document.getElementById("toggle-gasto-form-btn");
+      const importCard = document.getElementById("import-form-card");
+      const importToggleBtn = document.getElementById("toggle-import-form-btn");
+      if (!layout || !formColumn || !gastosColumn || !toggleBtn || !importCard || !importToggleBtn) {
+        return;
+      }
+
+      const showForm = () => {
+        formColumn.classList.remove("d-none");
+        gastosColumn.classList.remove("col-lg-12");
+        gastosColumn.classList.add("col-lg-8");
+        toggleBtn.classList.add("d-none");
+        const firstInput = formColumn.querySelector(
+          "input:not([type='hidden']):not([disabled]), select:not([disabled]), textarea:not([disabled])"
+        );
+        if (firstInput) {
+          firstInput.focus();
+        }
+      };
+
+      const hideForm = () => {
+        formColumn.classList.add("d-none");
+        gastosColumn.classList.remove("col-lg-8");
+        gastosColumn.classList.add("col-lg-12");
+        toggleBtn.classList.remove("d-none");
+        toggleBtn.textContent = "Novo";
+      };
+
+      if (layout.dataset.startVisible === "true") {
+        showForm();
+      } else {
+        hideForm();
+      }
+
+      toggleBtn.addEventListener("click", showForm);
+      importToggleBtn.addEventListener("click", function () {
+        importCard.classList.toggle("d-none");
+      });
+    })();
+  </script>
+{% endblock %}

@@ -1,0 +1,19 @@
+<tr>
+  <td>{{ gasto.data_compra|date:"d/m/Y H:i" }}</td>
+  <td>{{ gasto.descricao }}</td>
+  <td>{{ gasto.cartao.nome_apelido }}</td>
+  <td>{{ gasto.categoria.description }}</td>
+  <td>{{ gasto.cost_center|default:"—" }}</td>
+  <td>{{ gasto.competencia_label }}</td>
+  <td>{{ gasto.parcela_atual }}/{{ gasto.total_parcelas }}</td>
+  <td class="text-end">R$ {{ gasto.valor_total }}</td>
+  <td class="text-end">
+    <div class="d-inline-flex gap-2">
+      <a href="{% url 'cartao:gasto_edit' gasto.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
+      <form method="post" action="{% url 'cartao:gasto_delete' gasto.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button>
+      </form>
+    </div>
+  </td>
+</tr>

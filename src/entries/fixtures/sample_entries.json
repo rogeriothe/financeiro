@@ -1,20 +1,20 @@
 [
   {
-    "model": "entries.category",
+    "model": "core.category",
     "pk": 1,
     "fields": {
       "description": "Mensalidades"
     }
   },
   {
-    "model": "entries.category",
+    "model": "core.category",
     "pk": 2,
     "fields": {
       "description": "Serviços"
     }
   },
   {
-    "model": "entries.category",
+    "model": "core.category",
     "pk": 3,
     "fields": {
       "description": "Treinamentos"

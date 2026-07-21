@@ -1,0 +1,123 @@
+<div class="card-body p-0">
+  <div id="gastos-table" class="table-responsive">
+    <table class="table table-striped align-middle mb-0">
+    <thead class="table-light">
+      <tr>
+        <th style="width: 120px;">
+          <a class="link-dark text-decoration-none" href="?{{ sort_links.data_compra }}">
+            Compra{% if sort_by == "data_compra" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+          </a>
+        </th>
+        <th>
+          <a class="link-dark text-decoration-none" href="?{{ sort_links.descricao }}">
+            Descrição{% if sort_by == "descricao" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+          </a>
+        </th>
+        <th style="width: 100px;">
+          <a class="link-dark text-decoration-none" href="?{{ sort_links.cartao }}">
+            Cartão{% if sort_by == "cartao" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+          </a>
+        </th>
+        <th style="width: 120px;">
+          <a class="link-dark text-decoration-none" href="?{{ sort_links.categoria }}">
+            Categoria{% if sort_by == "categoria" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+          </a>
+        </th>
+        <th style="width: 120px;">
+          <a class="link-dark text-decoration-none" href="?{{ sort_links.cost_center }}">
+            Centro de custo{% if sort_by == "cost_center" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+          </a>
+        </th>
+        <th style="width: 100px;">
+          <a class="link-dark text-decoration-none" href="?{{ sort_links.competencia }}">
+            Competência{% if sort_by == "competencia" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+          </a>
+        </th>
+        <th style="width: 80px;">
+          <a class="link-dark text-decoration-none" href="?{{ sort_links.parcela_atual }}">
+            Parcela{% if sort_by == "parcela_atual" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+          </a>
+        </th>
+        <th class="text-end" style="width: 100px;">
+          <a class="link-dark text-decoration-none" href="?{{ sort_links.valor_total }}">
+            Valor{% if sort_by == "valor_total" %} {% if sort_direction == "asc" %}&uarr;{% else %}&darr;{% endif %}{% endif %}
+          </a>
+        </th>
+        <th style="width: 120px;"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if gastos %}
+        {% for gasto in gastos %}
+          {% include "cartao/partials/gasto_row.html" %}
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="9" class="text-center text-muted py-4">
+            Nenhum gasto cadastrado.
+          </td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+  <div class="card-footer bg-body-tertiary">
+    <nav aria-label="Paginação de gastos">
+      <ul class="pagination justify-content-end mb-0">
+        <li class="page-item{% if page_obj.number == 1 %} disabled{% endif %}">
+          <a
+            class="page-link"
+            href="{% if page_obj.number != 1 %}?{{ pagination_links.first }}{% else %}#{% endif %}"
+            tabindex="{% if page_obj.number != 1 %}0{% else %}-1{% endif %}"
+            aria-label="Primeira página"
+          >
+            Primeiro
+          </a>
+        </li>
+        <li class="page-item{% if not page_obj.has_previous %} disabled{% endif %}">
+          <a
+            class="page-link"
+            href="{% if page_obj.has_previous %}?{{ pagination_links.previous }}{% else %}#{% endif %}"
+            tabindex="{% if page_obj.has_previous %}0{% else %}-1{% endif %}"
+            aria-label="Página anterior"
+          >
+            Anterior
+          </a>
+        </li>
+        {% for number, page_link in pagination_links.pages %}
+          <li class="page-item{% if number == page_obj.number %} active{% endif %}">
+            <a
+              class="page-link"
+              href="?{{ page_link }}"
+            >
+              {{ number }}
+            </a>
+          </li>
+        {% endfor %}
+        <li class="page-item{% if not page_obj.has_next %} disabled{% endif %}">
+          <a
+            class="page-link"
+            href="{% if page_obj.has_next %}?{{ pagination_links.next }}{% else %}#{% endif %}"
+            tabindex="{% if page_obj.has_next %}0{% else %}-1{% endif %}"
+            aria-label="Próxima página"
+          >
+            Próxima
+          </a>
+        </li>
+        <li class="page-item{% if page_obj.number == page_obj.paginator.num_pages %} disabled{% endif %}">
+          <a
+            class="page-link"
+            href="{% if page_obj.number != page_obj.paginator.num_pages %}?{{ pagination_links.last }}{% else %}#{% endif %}"
+            tabindex="{% if page_obj.number != page_obj.paginator.num_pages %}0{% else %}-1{% endif %}"
+            aria-label="Última página"
+          >
+            Última
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+{% endif %}

@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h1 class="h3 mb-1">Dashboard financeiro</h1>
+      <p class="text-muted mb-0">Recebido e pago por mês com filtro por centro de custo.</p>
+    </div>
+    <form method="get" action="{% url 'dashboard' %}" class="d-flex gap-2 align-items-end">
+      <div>
+        <label class="form-label small text-muted mb-1" for="id_cost_center">Centro de custo</label>
+        <select id="id_cost_center" name="cost_center" class="form-select">
+          <option value="">Todos</option>
+          {% for cost_center in cost_centers %}
+            <option value="{{ cost_center.pk }}" {% if selected_cost_center == cost_center.pk|stringformat:"s" %}selected{% endif %}>
+              {{ cost_center.description }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Filtrar</button>
+    </form>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <div class="card shadow-sm dashboard-stat-card border-0">
+        <div class="card-body">
+          <small class="text-muted d-block mb-2">Total recebido no período</small>
+          <div class="display-6 text-success">R$ {{ total_received|floatformat:2|intcomma }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow-sm dashboard-stat-card border-0">
+        <div class="card-body">
+          <small class="text-muted d-block mb-2">Total pago no período</small>
+          <div class="display-6 text-danger">R$ {{ total_paid|floatformat:2|intcomma }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 dashboard-chart-card mb-4">
+    <div class="card-header bg-transparent border-0 pt-4 px-4">
+      <h2 class="h5 mb-1">Recebido x pago mês a mês</h2>
+      <p class="text-muted mb-0">Baseado em lançamentos liquidados usando a data de pagamento.</p>
+    </div>
+    <div class="card-body px-4 pb-4">
+      <div class="chart-wrapper">
+        <canvas id="cashflow-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-transparent">
+      <h2 class="h5 mb-0">Resumo mensal</h2>
+    </div>
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Mês</th>
+            <th>Recebido</th>
+            <th>Pago</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in chart_rows %}
+            <tr>
+              <td>{{ row.label }}</td>
+              <td class="text-success">R$ {{ row.recebido|floatformat:2|intcomma }}</td>
+              <td class="text-danger">R$ {{ row.pago|floatformat:2|intcomma }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script>
+    (function () {
+      const canvas = document.getElementById("cashflow-chart");
+      if (!canvas || typeof Chart === "undefined") {
+        return;
+      }
+
+      new Chart(canvas, {
+        type: "bar",
+        data: {
+          labels: {{ chart_labels_json|safe }},
+          datasets: [
+            {
+              label: "Recebido",
+              data: {{ received_data_json|safe }},
+              backgroundColor: "rgba(31, 166, 91, 0.85)",
+              borderRadius: 10,
+            },
+            {
+              label: "Pago",
+              data: {{ paid_data_json|safe }},
+              backgroundColor: "rgba(214, 63, 63, 0.85)",
+              borderRadius: 10,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: "index",
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              position: "bottom"
+            }
+          },
+          scales: {
+            x: {
+              grid: {
+                display: false
+              }
+            },
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    })();
+  </script>
+{% endblock %}

@@ -1,0 +1,38 @@
+<div class="table-responsive">
+  <table class="table align-middle mb-0">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Fechamento</th>
+        <th>Vencimento</th>
+        <th>Limite total</th>
+        <th>Disponível</th>
+        <th class="text-end">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cartao in cartoes %}
+        <tr>
+          <td>{{ cartao.nome_apelido }}</td>
+          <td>Dia {{ cartao.dia_fechamento }}</td>
+          <td>Dia {{ cartao.dia_vencimento }}</td>
+          <td>R$ {{ cartao.limite_total }}</td>
+          <td>R$ {{ cartao.limite_disponivel }}</td>
+          <td class="text-end">
+            <div class="d-inline-flex gap-2">
+              <a href="{% url 'cartao:cartao_edit' cartao.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
+              <form method="post" action="{% url 'cartao:cartao_delete' cartao.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="6" class="text-center text-muted py-4">Nenhum cartão cadastrado.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

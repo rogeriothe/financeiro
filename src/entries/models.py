@@ -5,18 +5,20 @@ from decimal import Decimal
 from django.db import models
 from django.utils import timezone
 
+from core.models import Category
+
 
 class EntryQuerySet(models.QuerySet):
-    def receivables(self) -> models.QuerySet["Entry"]:
+    def receivables(self) -> models.QuerySet[Entry]:
         return self.filter(original_value__gt=0)
 
-    def payables(self) -> models.QuerySet["Entry"]:
+    def payables(self) -> models.QuerySet[Entry]:
         return self.filter(original_value__lt=0)
 
-    def open(self) -> models.QuerySet["Entry"]:
+    def open(self) -> models.QuerySet[Entry]:
         return self.filter(payment_date__isnull=True)
 
-    def settled(self) -> models.QuerySet["Entry"]:
+    def settled(self) -> models.QuerySet[Entry]:
         return self.filter(payment_date__isnull=False)
 
 
@@ -27,18 +29,6 @@ class CostCenter(models.Model):
         ordering = ["description"]
         verbose_name = "centro de custo"
         verbose_name_plural = "centros de custo"
-
-    def __str__(self) -> str:  # pragma: no cover - human readable
-        return self.description
-
-
-class Category(models.Model):
-    description = models.CharField("Descrição", max_length=100, unique=True)
-
-    class Meta:
-        ordering = ["description"]
-        verbose_name = "categoria"
-        verbose_name_plural = "categorias"
 
     def __str__(self) -> str:  # pragma: no cover - human readable
         return self.description

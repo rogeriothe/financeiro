@@ -1,5 +1,6 @@
 :root {
   --financeiro-bg: #f8f9fb;
+  --financeiro-surface: linear-gradient(135deg, #fffdf7 0%, #eef5ff 100%);
 }
 
 body {
@@ -12,4 +13,14 @@ body {
 
 .badge {
   font-size: 0.75rem;
+}
+
+.dashboard-stat-card,
+.dashboard-chart-card {
+  background: var(--financeiro-surface);
+}
+
+.chart-wrapper {
+  position: relative;
+  min-height: 340px;
 }

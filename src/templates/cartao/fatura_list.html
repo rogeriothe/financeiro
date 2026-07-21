@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Faturas{% endblock %}
+
+{% block content %}
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h5 class="mb-0">Consultar fatura</h5>
+        </div>
+        <div class="card-body">
+          <form method="get" action="{% url 'cartao:fatura_list' %}">
+            <div class="mb-3">
+              <label class="form-label" for="id_cartao">Cartão</label>
+              <select id="id_cartao" name="cartao" class="form-select">
+                <option value="">Selecione um cartão</option>
+                {% for cartao in cartoes %}
+                  <option value="{{ cartao.pk }}" {% if selected_cartao == cartao.pk|stringformat:"s" %}selected{% endif %}>
+                    {{ cartao.nome_apelido }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="id_competencia">Competência</label>
+              <select id="id_competencia" name="competencia" class="form-select">
+                <option value="{{ selected_competencia }}">{{ selected_competencia }}</option>
+                {% for competencia in competencias %}
+                  {% if competencia != selected_competencia %}
+                    <option value="{{ competencia }}">{{ competencia }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Ver fatura</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-8">
+      {% if fatura %}
+        <div class="row g-3 mb-3">
+          <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+              <div class="card-body">
+                <small class="text-muted d-block">Competência</small>
+                <strong>{{ fatura.competencia.label }}</strong>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+              <div class="card-body">
+                <small class="text-muted d-block">Janela</small>
+                <strong>{{ fatura.data_inicio|date:"d/m/Y" }}</strong>
+                <div class="small text-muted">até {{ fatura.data_fechamento|date:"d/m/Y" }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+              <div class="card-body">
+                <small class="text-muted d-block">Vencimento</small>
+                <strong>{{ fatura.data_vencimento|date:"d/m/Y" }}</strong>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+              <div class="card-body">
+                <small class="text-muted d-block">Total</small>
+                <strong>R$ {{ fatura.total|floatformat:2|intcomma }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card shadow-sm">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <h5 class="mb-0">Itens da fatura</h5>
+            <span class="text-muted small">{{ fatura.cartao.nome_apelido }}</span>
+          </div>
+          {% include "cartao/partials/fatura_table.html" %}
+        </div>
+      {% else %}
+        <div class="card shadow-sm">
+          <div class="card-body text-muted py-5 text-center">
+            Selecione um cartão e uma competência para visualizar a fatura.
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
