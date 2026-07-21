@@ -30,28 +30,25 @@
       {{ entry.status }}
     </span>
   </td>
-  <td>
-    <div class="d-flex flex-column gap-1">
-      {% if entry.fatura %}
-        <a href="{{ entry.fatura.url }}" target="_blank" rel="noopener">Fatura</a>
-      {% endif %}
-      {% if entry.comprovante %}
-        <a href="{{ entry.comprovante.url }}" target="_blank" rel="noopener">Comprovante</a>
-      {% endif %}
-      {% if not entry.fatura and not entry.comprovante %}
-        <span class="text-muted">—</span>
-      {% endif %}
-    </div>
-  </td>
   <td class="text-end">
-    <div class="d-flex justify-content-end gap-2">
-      <a class="btn btn-outline-secondary btn-sm" href="{% url 'entries:edit' entry.pk %}">
-        Editar
+    <div class="d-flex justify-content-end gap-1">
+      <a
+        class="btn btn-outline-secondary btn-sm"
+        href="{% url 'entries:edit' entry.pk %}"
+        title="Editar"
+        aria-label="Editar"
+      >
+        <i class="bi bi-pencil-square"></i>
       </a>
       <form method="post" action="{% url 'entries:clone' entry.pk %}" class="d-inline">
         {% csrf_token %}
-        <button class="btn btn-outline-primary btn-sm" type="submit">
-          Clonar
+        <button
+          class="btn btn-outline-primary btn-sm"
+          type="submit"
+          title="Clonar"
+          aria-label="Clonar"
+        >
+          <i class="bi bi-files"></i>
         </button>
       </form>
       <form method="post" action="{% url 'entries:delete' entry.pk %}" class="d-inline">
@@ -59,9 +56,11 @@
         <button
           class="btn btn-outline-danger btn-sm"
           type="submit"
+          title="Excluir"
+          aria-label="Excluir"
           onclick="return confirm('Deseja remover o lançamento?');"
         >
-          Excluir
+          <i class="bi bi-trash"></i>
         </button>
       </form>
     </div>

@@ -79,19 +79,21 @@ def _totals_context(entries_queryset=None) -> dict[str, Decimal]:
         return queryset.aggregate(total=Sum(field))["total"] or Decimal("0.00")
 
     filtered_entries = entries_queryset if entries_queryset is not None else Entry.objects.all()
-    receivables_total = _safe_sum(filtered_entries.receivables(), "original_value")
-    payables_total = abs(_safe_sum(filtered_entries.payables(), "original_value"))
-    result_total = _safe_sum(filtered_entries.settled(), "received_value")
-    receivables_received_total = _safe_sum(filtered_entries.receivables(), "received_value")
-    outstanding_total = receivables_total - receivables_received_total
-    if outstanding_total < 0:
-        outstanding_total = Decimal("0.00")
+    receivables = filtered_entries.receivables()
+    payables = filtered_entries.payables()
+
+    receitas_previstas = _safe_sum(receivables, "original_value")
+    receitas_realizadas = _safe_sum(receivables.settled(), "received_value")
+    despesas_previstas = abs(_safe_sum(payables, "original_value"))
+    despesas_realizadas = abs(_safe_sum(payables.settled(), "received_value"))
 
     return {
-        "receivables_total": receivables_total,
-        "payables_total": payables_total,
-        "result_total": result_total,
-        "outstanding_total": outstanding_total,
+        "receitas_previstas": receitas_previstas,
+        "receitas_realizadas": receitas_realizadas,
+        "despesas_previstas": despesas_previstas,
+        "despesas_realizadas": despesas_realizadas,
+        "resultado_previsto": receitas_previstas - despesas_previstas,
+        "resultado_realizado": receitas_realizadas - despesas_realizadas,
     }
 
 

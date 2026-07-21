@@ -1,44 +1,69 @@
 {% load humanize %}
 <div class="row g-3">
-  <div class="col-sm-6 col-xl-3">
+  <div class="col-sm-6 col-xl-4">
     <div class="card border-success-subtle">
       <div class="card-body text-success">
-        <h6 class="text-uppercase small fw-semibold">Recebimentos</h6>
-        <p class="fs-4 mb-0">R$ {{ receivables_total|floatformat:2 }}</p>
+        <h6 class="text-uppercase small fw-semibold">Receitas previstas</h6>
+        <p class="fs-4 mb-0">R$ {{ receitas_previstas|floatformat:2 }}</p>
       </div>
     </div>
   </div>
-  <div class="col-sm-6 col-xl-3">
+  <div class="col-sm-6 col-xl-4">
+    <div class="card border-success-subtle">
+      <div class="card-body text-success">
+        <h6 class="text-uppercase small fw-semibold">Receitas realizadas</h6>
+        <p class="fs-4 mb-0">R$ {{ receitas_realizadas|floatformat:2 }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-4">
     <div class="card border-danger-subtle">
       <div class="card-body text-danger">
-        <h6 class="text-uppercase small fw-semibold">Pagamentos</h6>
-        <p class="fs-4 mb-0">R$ {{ payables_total|floatformat:2 }}</p>
+        <h6 class="text-uppercase small fw-semibold">Despesas previstas</h6>
+        <p class="fs-4 mb-0">R$ {{ despesas_previstas|floatformat:2 }}</p>
       </div>
     </div>
   </div>
-  <div class="col-sm-6 col-xl-3">
-    {% if result_total >= 0 %}
+  <div class="col-sm-6 col-xl-4">
+    <div class="card border-danger-subtle">
+      <div class="card-body text-danger">
+        <h6 class="text-uppercase small fw-semibold">Despesas realizadas</h6>
+        <p class="fs-4 mb-0">R$ {{ despesas_realizadas|floatformat:2 }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-4">
+    {% if resultado_previsto >= 0 %}
       <div class="card border-success-subtle">
         <div class="card-body text-success">
-          <h6 class="text-uppercase small fw-semibold">Resultado</h6>
-          <p class="fs-4 mb-0">R$ +{{ result_total|floatformat:2 }}</p>
+          <h6 class="text-uppercase small fw-semibold">Resultado previsto</h6>
+          <p class="fs-4 mb-0">R$ +{{ resultado_previsto|floatformat:2 }}</p>
         </div>
       </div>
     {% else %}
       <div class="card border-danger-subtle">
         <div class="card-body text-danger">
-          <h6 class="text-uppercase small fw-semibold">Resultado</h6>
-          <p class="fs-4 mb-0">R$ -{{ result_total|floatformat:2|slice:"1:" }}</p>
+          <h6 class="text-uppercase small fw-semibold">Resultado previsto</h6>
+          <p class="fs-4 mb-0">R$ -{{ resultado_previsto|floatformat:2|slice:"1:" }}</p>
         </div>
       </div>
     {% endif %}
   </div>
-  <div class="col-sm-6 col-xl-3">
-    <div class="card border-warning-subtle">
-      <div class="card-body text-warning">
-        <h6 class="text-uppercase small fw-semibold">Saldo em aberto</h6>
-        <p class="fs-4 mb-0">R$ {{ outstanding_total|floatformat:2 }}</p>
+  <div class="col-sm-6 col-xl-4">
+    {% if resultado_realizado >= 0 %}
+      <div class="card border-success-subtle">
+        <div class="card-body text-success">
+          <h6 class="text-uppercase small fw-semibold">Resultado realizado</h6>
+          <p class="fs-4 mb-0">R$ +{{ resultado_realizado|floatformat:2 }}</p>
+        </div>
       </div>
-    </div>
+    {% else %}
+      <div class="card border-danger-subtle">
+        <div class="card-body text-danger">
+          <h6 class="text-uppercase small fw-semibold">Resultado realizado</h6>
+          <p class="fs-4 mb-0">R$ -{{ resultado_realizado|floatformat:2|slice:"1:" }}</p>
+        </div>
+      </div>
+    {% endif %}
   </div>
 </div>
